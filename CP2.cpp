@@ -35,10 +35,18 @@ struct persistentBinaryTree {
     if (lBoard == rBoard) {
       return;
     }
-    int median = (rBoard + lBoard) / 2;
-    curNode = new node(events[median].y);
-    buildBaseTree(curNode->left, lBoard, median);
-    buildBaseTree(curNode->right, median + 1, rBoard);
+    int lMedian = (rBoard + lBoard) / 2;
+    int rMedian = lMedian + 1;
+    curNode = new node(events[lMedian].y);
+    //нужно не пустить в дерево одинаковые игрики
+    while (lMedian > 1 && events[lMedian - 1].y == events[lMedian].y) {
+      --lMedian;
+    }
+    while (rMedian <= nn && events[rMedian].y == events[rMedian - 1].y) {
+      ++rMedian;
+    }
+    buildBaseTree(curNode->left, lBoard, lMedian);
+    buildBaseTree(curNode->right, rMedian, rBoard);
   }
 
 
@@ -113,7 +121,7 @@ struct persistentBinaryTree {
     for (int i = 1; i <= nn; ++i) {
       buildPersistenBranch(i);
     }
-    
+
     //устранение случаев с кучей одинаковых икс, нужен только самый правый
     //для этого в более левых одинаковых икс делаю указатель на более правую ветку
     int prevX = events[nn].x;
@@ -159,7 +167,7 @@ struct persistentBinaryTree {
     //нужно в два раза больше места для событий тк храним начало и конец,
     //еще одно место для базового дерева
     events.resize(nn + 1); //nn = n*2
-    
+
     //в нулевой точке будет храниться дерево со всеми высотами и нулевыми значениями
     events[0] = {true, -2000000000, 0, nullptr};
   }
@@ -183,7 +191,7 @@ struct persistentBinaryTree {
     //бинарным поиском ищем где x
     //поиск кривой, надо функцию фулл переписать
     //если код не работает, то скорее всего ошибка в бинпоиске
-    
+
     int curX = n, lb = 1, rb = nn; //n - середина, тк nn = n*2
     while(rb - lb >= 0) {
       if (x < events[curX].x) {
@@ -212,14 +220,14 @@ int main() {
   cin >> n >> m;
 
   persistentBinaryTree tree(n);
-  
+
   tree.scanAndFill();
-  
+
   int t_x, t_y;
   for(int i = 0; i < m; ++i) {
     cin >> t_x >> t_y;
     cout << tree.request(t_x, t_y) << '\n';
   }
-  
+
   return 0;
 }

@@ -47,6 +47,7 @@ private:
 
         int median = (lb + rb) / 2;
 
+        // важная оптимизация
         while(median < rb - 1 && data[median][t_dim] == data[median + 1][t_dim]) {
             ++median;
         }
